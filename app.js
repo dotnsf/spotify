@@ -5,14 +5,19 @@ var cfenv = require( 'cfenv' );               // 実行環境における空き�
 var express = require( 'express' );           // Express フレームワーク
 var bodyParser = require( 'body-parser' );    // 送信データの取得用
 var request = require( 'request' );
+var SpotifyWebApi = require( 'spotify-web-api-node' );
+
 var settings = require( './settings' );
+
 var app = express();
 
 // cfenv を使ってアプリケーションの環境を取得
 var appEnv = cfenv.getAppEnv();
 
-var access_token = null;
-getAccessToken().then( function( token ){ access_token = token; } );
+var spotifyApi = new SpotifyWebApi();
+getAccessToken().then( function( token ){
+  spotifyApi.setAccessToken( token );
+});
 
 // body-parser の挙動を設定
 app.use( bodyParser.urlencoded() );
@@ -34,17 +39,11 @@ app.get( '/', function( req, res ){
 app.get( '/artists/:id', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
   var id = req.params.id;
+  var limit = req.query.limit ? parseInt( req.query.limit ) : 10;
+  var offset = req.query.offset ? parseInt( req.query.offset ) : 0;
 
-  if( access_token && id ){
-    var option = {
-      url: 'https://api.spotify.com/v1/artists/' + id,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + access_token
-      }
-    };
-    request( option, ( err0, res0, body0 ) => {
+  if( spotifyApi && id ){
+    spotifyApi.getArtistAlbums( id, { limit: limit, offset: offset }, function( err0, body0 ){
       if( err0 ){
         console.log( err0 );
         res.status( 400 );
@@ -59,6 +58,58 @@ app.get( '/artists/:id', function( req, res ){
   }else{
     res.status( 400 );
     res.write( JSON.stringify( { status: false, result: 'No access_token and/or id provided.' }, 2, null ) );
+    res.end();
+  }
+});
+
+app.get( '/searchTracks', function( req, res ){
+  res.contentType( 'application/json; charset=utf-8' );
+  var keyword = req.query.keyword;
+  var limit = req.query.limit ? parseInt( req.query.limit ) : 10;
+  var offset = req.query.offset ? parseInt( req.query.offset ) : 0;
+
+  if( spotifyApi && keyword ){
+    spotifyApi.searchTracks( keyword, { limit: limit, offset: offset }, function( err0, body0 ){
+      if( err0 ){
+        console.log( err0 );
+        res.status( 400 );
+        res.write( JSON.stringify( { status: false, result: err0 }, 2, null ) );
+        res.end();
+      }else{
+        console.log( body0 );
+        res.write( JSON.stringify( { status: true, result: body0 }, 2, null ) );
+        res.end();
+      }
+    });
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, result: 'No access_token and/or keyword provided.' }, 2, null ) );
+    res.end();
+  }
+});
+
+app.get( '/searchArtists', function( req, res ){
+  res.contentType( 'application/json; charset=utf-8' );
+  var keyword = req.query.keyword;
+  var limit = req.query.limit ? parseInt( req.query.limit ) : 10;
+  var offset = req.query.offset ? parseInt( req.query.offset ) : 0;
+
+  if( spotifyApi && keyword ){
+    spotifyApi.searchArtists( keyword, { limit: limit, offset: offset }, function( err0, body0 ){
+      if( err0 ){
+        console.log( err0 );
+        res.status( 400 );
+        res.write( JSON.stringify( { status: false, result: err0 }, 2, null ) );
+        res.end();
+      }else{
+        console.log( body0 );
+        res.write( JSON.stringify( { status: true, result: body0 }, 2, null ) );
+        res.end();
+      }
+    });
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, result: 'No access_token and/or keyword provided.' }, 2, null ) );
     res.end();
   }
 });

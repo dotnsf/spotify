@@ -5,12 +5,13 @@
         "start": "node app.js"
     },
     "dependencies": {
+        "@cloudant/cloudant": "^3.0.1",
         "body-parser": "~1.18.x",
         "cfenv": "~1.0.0",
-        "@cloudant/cloudant": "^3.0.1",
         "ejs": "^2.3.4",
         "express": "4.1.x",
-        "request": "2.83.0"
+        "request": "2.83.0",
+        "spotify-web-api-node": "^4.0.0"
     },
     "repository": {},
     "engines": {

@@ -13,6 +13,10 @@ Sample application for Spotify API
 
     - https://developer.spotify.com/dashboard/
 
+- spotify-web-api-node
+
+    - https://github.com/thelinmichael/spotify-web-api-node
+
 
 ## Copyright
 
