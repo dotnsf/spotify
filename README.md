@@ -1,9 +1,9 @@
-# webapp_dev
+# spotify_api_sample
 
 
 ## Overview
 
-Web Application Development training template.
+Sample application for Spotify API
 
 
 
